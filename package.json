@@ -1,0 +1,14 @@
+{
+  "name": "balloonwatch",
+  "version": "1.0.0",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^13.7.0",
+    "moment": "^2.29.3",
+    "mongodb": "^4.6.0",
+    "mqtt": "^4.3.7"
+  },
+  "scripts": {
+    "start": "node main.js"
+  }
+}
