@@ -74,7 +74,7 @@ const discordSend = sonde => {
                 {
                     "type": "rich",
                     "title": `${sonde.type} ${sonde.serial} has launched`,
-                    "description": "",
+                    "description": "Alert type: <@980937254627328010>",
                     "color": 0x00FFFF,
                     "url": `https://sondehub.org/${sonde.serial}`
                 }
@@ -103,6 +103,10 @@ const discordSend = sonde => {
                         },
                         {
                             "name": `Altitude: ${sonde.alt} m`,
+                            "value": "\u200B"
+                        },
+                        {
+                            "name": "Alert type: <@980937254627328010>",
                             "value": "\u200B"
                         }
                     ],
