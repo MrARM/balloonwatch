@@ -85,7 +85,7 @@ const discordSend = sonde => {
             "embeds": [
                 {
                     "type": "rich",
-                    "title": `Ususual Sonde launch detected!`,
+                    "title": `Unusual Sonde launch detected!`,
                     "description": "",
                     "color": 0x00FFFF,
                     "fields": [
