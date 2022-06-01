@@ -70,11 +70,12 @@ const checkUsualTime = () => {
 const discordSend = sonde => {
     if(checkUsualTime()){
         discord.channels.cache.get(process.env.DISCORD_CHANNEL).send({
+            "content": "<@&980936900204441630>",
             "embeds": [
                 {
                     "type": "rich",
                     "title": `${sonde.type} ${sonde.serial} has launched`,
-                    "description": "Alert type: <@&980936900204441630>",
+                    "description": "Alert type: ",
                     "color": 0x00FFFF,
                     "url": `https://sondehub.org/${sonde.serial}`
                 }
@@ -82,6 +83,7 @@ const discordSend = sonde => {
         });
     } else {
         discord.channels.cache.get(process.env.DISCORD_CHANNEL).send({
+            "content": "<@&980937123463069716>",
             "embeds": [
                 {
                     "type": "rich",
@@ -103,10 +105,6 @@ const discordSend = sonde => {
                         },
                         {
                             "name": `Altitude: ${sonde.alt} m`,
-                            "value": "\u200B"
-                        },
-                        {
-                            "name": "Pinging: <@&980937123463069716>",
                             "value": "\u200B"
                         }
                     ],
