@@ -75,7 +75,7 @@ const discordSend = sonde => {
                 {
                     "type": "rich",
                     "title": `${sonde.type} ${sonde.serial} has launched`,
-                    "description": "Alert type: ",
+                    "description": "",
                     "color": 0x00FFFF,
                     "url": `https://sondehub.org/${sonde.serial}`
                 }
