@@ -26,4 +26,4 @@ Everyone is welcome to pitch code to this project, just fork and make a pull req
 All extensions to what the core(discord, mqtt, db) does should be written in `features/` if applicable.
 If a javascript file is just filled with comments in the aforementioned directory, it is a work and progress, and you can see some changes being made in other branches of this repository.
 
-When creating a new feature, please add a Jest test for it, it helps automated testing and can help pinpoint a problem.
+When creating a new feature, please add a Jest test for it, it helps automated testing and can help pinpoint a problem
