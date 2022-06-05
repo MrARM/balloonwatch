@@ -4,9 +4,9 @@ const moment = require('moment');
 const {MongoClient} = require('mongodb');
 const mqtt = require('mqtt');
 
-const config = require('./config.json');
-const sondeTemplate = ('./sondeTemplates.js');
-const utils = require('./utils.js');
+const config = require('../config.json');
+const sondeTemplate = require('./features/sondeTemplates');
+const utils = require('./utils');
 
 // Instances
 const discord = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
