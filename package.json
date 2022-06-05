@@ -4,11 +4,13 @@
   "license": "MIT",
   "dependencies": {
     "discord.js": "^13.7.0",
+    "jest": "^28.1.0",
     "moment": "^2.29.3",
     "mongodb": "^4.6.0",
     "mqtt": "^4.3.7"
   },
   "scripts": {
-    "start": "node core.js"
+    "start": "node src/core.js",
+    "test": "jest"
   }
 }

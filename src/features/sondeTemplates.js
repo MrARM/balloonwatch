@@ -1,7 +1,8 @@
 // Contains all templates used on discord to send or update messages
 
-const discordEmbedWrapper = message => {
+const discordEmbedWrapper = (content, message) => {
     return {
+        content,
         embeds: [
             message
         ]
@@ -11,8 +12,8 @@ const discordEmbedWrapper = message => {
 const normalLaunch = sonde => {
     return {
                 type: "rich",
-                title: `${sonde.type} ${sonde.serial} has launched`,
-                description: "Pinging: <@&980936900204441630>",
+                title: `${sonde.subtype} ${sonde.serial} has launched`,
+                description: "",
                 color: 0x00FFFF,
                 url: `https://sondehub.org/${sonde.serial}`
             };
@@ -40,10 +41,6 @@ const unusualLaunch = sonde => {
             {
                 "name": `Altitude: ${sonde.alt} m`,
                 "value": "\u200B"
-            },
-            {
-                "name": "Pinging: <@&980937123463069716>",
-                "value": "\u200B"
             }
         ],
         "image": {
@@ -56,7 +53,8 @@ const unusualLaunch = sonde => {
 };
 
 module.exports = {
-    normal: sonde => discordEmbedWrapper(normalLaunch(sonde)),
-    unusual: sonde => discordEmbedWrapper(unusualLaunch(sonde)),
+    normal: sonde => discordEmbedWrapper("<@&980936900204441630>", normalLaunch(sonde)),
+    unusual: sonde => discordEmbedWrapper("<@&980937123463069716>", unusualLaunch(sonde)),
+    discordEmbedWrapper
 }
 
