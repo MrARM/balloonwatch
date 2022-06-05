@@ -3,37 +3,21 @@ const {Client, Intents} = require('discord.js');
 const moment = require('moment');
 const {MongoClient} = require('mongodb');
 const mqtt = require('mqtt');
-const config = require('./config.json');
+
+const config = require('../config.json');
+const sondeTemplate = require('./features/sondeTemplates');
+const utils = require('./utils');
 
 // Instances
 const discord = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
 const client = mqtt.connect('wss://ws-reader.v2.sondehub.org');
 const mongo = new MongoClient(process.env.MONGO_URI || 'mongodb://localhost:27017/');
+
 // State
 let discord_active = false;
 let mongodb = false;
 // This stops rapid floods of messages by only queueing a message to be sent once
 let sondeQueue = [];
-
-// Additional functions
-const inside_poly = (point, vs) => {
-    // ray-casting algorithm based on
-    // https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html/pnpoly.html
-
-    const x = point[0], y = point[1];
-
-    let inside = false;
-    for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-        let xi = vs[i][0], yi = vs[i][1];
-        let xj = vs[j][0], yj = vs[j][1];
-
-        let intersect = ((yi > y) != (yj > y))
-            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-        if (intersect) inside = !inside;
-    }
-
-    return inside;
-};
 
 const queueSend = sonde => {
     let can_add = true;
@@ -57,72 +41,15 @@ const queueSend = sonde => {
     });
 };
 
-const checkUsualTime = () => {
-    let usualTime = true;
-    // Check if unusual
-    const hour = moment.utc().hour();
-    if(!config.usual_hours.includes(hour)){
-        usualTime = false;
-    }
-    return usualTime;
-}
-
 const discordSend = sonde => {
-    if(checkUsualTime()){
-        discord.channels.cache.get(process.env.DISCORD_CHANNEL).send({
-            "content": "<@&980936900204441630>",
-            "embeds": [
-                {
-                    "type": "rich",
-                    "title": `${sonde.type} ${sonde.serial} has launched`,
-                    "description": "",
-                    "color": 0x00FFFF,
-                    "url": `https://sondehub.org/${sonde.serial}`
-                }
-            ]
-        });
+    if (utils.checkUsualTime()) {
+        discord.channels.cache.get(process.env.DISCORD_CHANNEL).send(sondeTemplate.normal(sonde));
     } else {
-        discord.channels.cache.get(process.env.DISCORD_CHANNEL).send({
-            "content": "<@&980937123463069716>",
-            "embeds": [
-                {
-                    "type": "rich",
-                    "title": `Unusual Sonde launch detected!`,
-                    "description": "",
-                    "color": 0x00FFFF,
-                    "fields": [
-                        {
-                            "name": `${sonde.type} ${sonde.serial}`,
-                            "value": "\u200B"
-                        },
-                        {
-                            "name": `Frequency: ${sonde.frequency} MHz`,
-                            "value": `\u200B`
-                        },
-                        {
-                            "name": `Position: ${sonde.lat}, ${sonde.lon}`,
-                            "value": "\u200B"
-                        },
-                        {
-                            "name": `Altitude: ${sonde.alt} m`,
-                            "value": "\u200B"
-                        }
-                    ],
-                    "image": {
-                        "url": `https://i.imgur.com/T7goLBv.png`,
-                        "height": 0,
-                        "width": 0
-                    },
-                    "url": `https://sondehub.org/${sonde.serial}`
-                }
-            ]
-        }
-        );
+        discord.channels.cache.get(process.env.DISCORD_CHANNEL).send(sondeTemplate.unusual(sonde));
     }
 };
 
 // Startup
-//region discord
 // You will need to set DISCORD_TOKEN as an environment variable in order to use this bot in your own server.
 if (process.env.DISCORD_TOKEN === undefined || process.env.DISCORD_CHANNEL === undefined) {
     console.warn('Either DISCORD_TOKEN or DISCORD_CHANNEL is not set, discord sending is disabled.');
@@ -137,8 +64,6 @@ discord.once('ready', () => {
     discord_active = true;
 });
 
-//endregion
-//region mqtt
 client.on('connect', function () {
     client.subscribe('batch', function (err) {
         if (!err) {
@@ -151,7 +76,7 @@ client.on('message', function (topic, message) {
     // message is Buffer
     const batch_input = JSON.parse(message.toString());
     batch_input.forEach((sonde) => {
-        if (inside_poly([sonde.lon, sonde.lat], config.watch_polygon)) {
+        if (utils.inside_poly([sonde.lon, sonde.lat], config.watch_polygon)) {
             if (mongodb !== false) {
 
                 // If a database connection was established continue
@@ -170,8 +95,8 @@ client.on('message', function (topic, message) {
         }
     });
 });
-//endregion
-//region mongo
+
+// Mongo stuff
 mongo.connect().then((response) => {
     mongo.db('admin').command({ping: 1}).then((response) => {
         console.log('[Mongo] Connected.');
@@ -188,9 +113,9 @@ mongo.connect().then((response) => {
     console.error(err);
     process.exit(1);
 });
-//endregion
 
-//region queue check system
+
+// Queue check system
 setInterval(() => {
     sondeQueue.forEach((queuedSonde) => {
         if (queuedSonde.release < parseInt(moment().format('X'))) {
@@ -204,4 +129,3 @@ setInterval(() => {
         }
     })
 }, 1000);
-//endregion
