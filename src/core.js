@@ -21,22 +21,36 @@ let sondeQueue = [];
 
 const queueSend = sonde => {
     let can_add = true;
-    if (sondeQueue.length === 0) {
-        sonde.release = parseInt(moment().format('X')) + 10;
-        sondeQueue.push(sonde);
-        console.log(`[Balloon] New sonde detected! ${sonde.manufacturer} ${sonde.type} ${sonde.serial}`);
-        return;
-    }
-    sondeQueue.forEach((qsonde, idx, arr) => {
-        if (qsonde.serial === sonde.serial) {
-            can_add = false;
-        }
 
+    // Ignore regular sondes from nearby launch sites
+    config.ignored_areas.forEach((area, idx, arr)=>{
+        if(utils.inside_poly([sonde.lon, sonde.lat], area.watch_polygon)){
+            can_add = false;
+            console.log(`[Balloon] Sonde ${sonde.type} ${sonde.serial} from ${area.name} is being ignored!`);
+            return;
+        }
+        // Run after ignored area checks complete
         if (idx === arr.length - 1) {
-            if (can_add) {
-                sondeQueue.push(sonde);
+            if (sondeQueue.length === 0) {
+                sonde.release = parseInt(moment().format('X')) + 10;
                 console.log(`[Balloon] New sonde detected! ${sonde.manufacturer} ${sonde.type} ${sonde.serial}`);
+                if(can_add){
+                    sondeQueue.push(sonde);
+                }
+                return;
             }
+            sondeQueue.forEach((qsonde, idx, arr) => {
+                if (qsonde.serial === sonde.serial) {
+                    can_add = false;
+                }
+
+                if (idx === arr.length - 1) {
+                    if (can_add) {
+                        sondeQueue.push(sonde);
+                        console.log(`[Balloon] New sonde detected! ${sonde.manufacturer} ${sonde.type} ${sonde.serial}`);
+                    }
+                }
+            });
         }
     });
 };
