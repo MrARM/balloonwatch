@@ -1,4 +1,5 @@
 // Contains all templates used on discord to send or update messages
+const rs41Datecode = require('./rs41_datecode');
 
 const discordEmbedWrapper = (content, message) => {
     return {
@@ -9,13 +10,23 @@ const discordEmbedWrapper = (content, message) => {
     };
 }
 
+const appendRS41Datecode = (sonde, embed) => {
+    const dateObj = rs41Datecode.resolveDate(sonde.serial);
+    embed.fields.push({
+        "name": `Sonde manufactured: ${dateObj.toLocaleDateString('en-US')}`,
+        "value": "\u200B"
+    });
+    return embed;
+};
+
 const normalLaunch = sonde => {
     return {
                 type: "rich",
                 title: `${sonde.subtype} ${sonde.serial} has launched`,
                 description: "",
                 color: 0x00FFFF,
-                url: `https://sondehub.org/${sonde.serial}`
+                url: `https://sondehub.org/${sonde.serial}`,
+                "fields": []
             };
 };
 
@@ -27,7 +38,7 @@ const unusualLaunch = sonde => {
         "color": 0x00FFFF,
         "fields": [
             {
-                "name": `${sonde.type} ${sonde.serial}`,
+                "name": `${sonde.subtype} ${sonde.serial}`,
                 "value": "\u200B"
             },
             {
@@ -53,8 +64,20 @@ const unusualLaunch = sonde => {
 };
 
 module.exports = {
-    normal: sonde => discordEmbedWrapper("<@&980936900204441630>", normalLaunch(sonde)),
-    unusual: sonde => discordEmbedWrapper("<@&980937123463069716>", unusualLaunch(sonde)),
+    normal: sonde => {
+        let embed = normalLaunch(sonde);
+        if(sonde.type == 'RS41'){
+            embed = appendRS41Datecode(sonde, embed);
+        }
+        return discordEmbedWrapper("<@&980936900204441630>", embed);
+    },
+    unusual: sonde => {
+        let embed = unusualLaunch(sonde);
+        if(sonde.type == 'RS41'){
+            embed = appendRS41Datecode(sonde, embed);
+        }
+        return discordEmbedWrapper("<@&980937123463069716>", embed);
+    },
     discordEmbedWrapper
 }
 
