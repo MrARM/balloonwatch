@@ -5,6 +5,7 @@ const config = require("../config.json");
 const inside_poly = (point, vs) => {
     // ray-casting algorithm based on
     // https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html/pnpoly.html
+    // Create polygons for this at https://www.keene.edu/campus/maps/tool/
 
     const x = point[0], y = point[1];
 
