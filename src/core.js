@@ -26,7 +26,6 @@ const queueSend = sonde => {
     config.ignored_areas.forEach((area, idx, arr)=>{
         if(utils.inside_poly([sonde.lon, sonde.lat], area.watch_polygon)){
             can_add = false;
-            console.log(`[Balloon] Sonde ${sonde.type} ${sonde.serial} from ${area.name} is being ignored!`);
             return;
         }
         // Run after ignored area checks complete
