@@ -26,7 +26,12 @@ const normalLaunch = sonde => {
                 description: "",
                 color: 0x00FFFF,
                 url: `https://sondehub.org/${sonde.serial}`,
-                "fields": []
+                "fields": [
+                    {
+                        "name": `Frequency: ${sonde.frequency} MHz`,
+                        "value": `\u200B`
+                    }
+                ]
             };
 };
 
