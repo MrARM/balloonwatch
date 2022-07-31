@@ -35,13 +35,16 @@ const REFRESH_TIME = 2 * 60000; // Refresh every X minutes
 const RESET_TIME = 10 * 60; // Stop tracking if predictions says it landed after X minutes.
 
 const constUpdate = (sonde, message, original) => {
+    console.log(`[SondeUpdates] Starting update for sonde ${sonde.serial}`);
     // Grab sonde info
     fetch(`https://api.v2.sondehub.org/predictions?vehicles=${sonde.serial}`).then(response => response.json().then(sondePredRaw => {
         const sondeData = decodeSHPrediction(sondePredRaw);
         // Get location for current position
         decodeCityState(sondeData.latitude, sondeData.longitude).then(currentLocation => {
             // Next, predicted
+            console.debug(`[SondeUpdates:D] Currloc: ${currentLocation}`);
             decodeCityState(sondeData.predictedLatitude, sondeData.predictedLongitude).then(predictedLocation => {
+                console.debug(`[SondeUpdates:D] Predloc: ${currentLocation}`);
                 /* We have everything we want for a message.
                  * sondeData - Location of the radiosonde + prediction
                  * currentLocation
@@ -72,9 +75,9 @@ const constUpdate = (sonde, message, original) => {
                         setTimeout(()=>constUpdate(sonde, nmsg, original),REFRESH_TIME);
                     }
                 });
-            });
-        });
-    }));
+            }).catch(err=>console.error(`[SondeUpdates:E] ${err}`));
+        }).catch(err=>console.error(`[SondeUpdates:E] ${err}`));
+    })).catch(err=>console.error(`[SondeUpdates:E] ${err}`));
 };
 
 const decodeCityState = (latitude, longitude) => {
