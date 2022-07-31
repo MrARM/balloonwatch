@@ -5,6 +5,7 @@ const {MongoClient} = require('mongodb');
 const mqtt = require('mqtt');
 
 const config = require('../config.json');
+const sondeUpdates = require('./features/sondeUpdates');
 const sondeTemplate = require('./features/sondeTemplates');
 const utils = require('./utils');
 
@@ -56,9 +57,13 @@ const queueSend = sonde => {
 
 const discordSend = sonde => {
     if (utils.checkUsualTime()) {
-        discord.channels.cache.get(process.env.DISCORD_CHANNEL).send(sondeTemplate.normal(sonde));
+        const generatedMessage = sondeTemplate.normal(sonde);
+        discord.channels.cache.get(process.env.DISCORD_CHANNEL).send(generatedMessage).then(nmsg=>{
+            setTimeout(()=>sondeUpdates.constUpdate(sonde, nmsg, generatedMessage), 60 * 1000);
+        });
     } else {
-        discord.channels.cache.get(process.env.DISCORD_CHANNEL).send(sondeTemplate.unusual(sonde));
+        const generatedUnusualMessage = sondeTemplate.unusual(sonde);
+        discord.channels.cache.get(process.env.DISCORD_CHANNEL).send(generatedUnusualMessage);
     }
 };
 
