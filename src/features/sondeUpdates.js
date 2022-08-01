@@ -87,7 +87,7 @@ const constUpdate = (sonde, message, original, unusual) => {
                 ];
                 // If RS41
                 if(sonde.type === 'RS41'){
-                    newEmbed = sondeTemplates.appendRS41Datecode(sonde, embed);
+                    newEmbed = sondeTemplates.appendRS41Datecode(sonde, newEmbed);
                 }
                 // Update msg
                 message.edit({
