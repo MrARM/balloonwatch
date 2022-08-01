@@ -29,16 +29,22 @@
 const bdcApi = require('@bigdatacloudapi/client')('bdc_3d481cc4c2634116a59c23f2d47383a6');
 const fetch = require('node-fetch');
 const moment = require('moment-timezone');
+const sondeTemplates = require('./sondeTemplates');
+const utils = require("../utils");
 
 const TIMEZONE = 'America/Chicago';
 const REFRESH_TIME = 2 * 60000; // Refresh every X minutes
 const RESET_TIME = 10 * 60; // Stop tracking if predictions says it landed after X minutes.
 
-const constUpdate = (sonde, message, original) => {
+const constUpdate = (sonde, message, original, unusual) => {
     console.log(`[SondeUpdates] Starting update for sonde ${sonde.serial}`);
     // Grab sonde info
     fetch(`https://api.v2.sondehub.org/predictions?vehicles=${sonde.serial}`).then(response => response.json().then(sondePredRaw => {
         const sondeData = decodeSHPrediction(sondePredRaw);
+        if(sondeData.error){
+            console.error(`ERR! URL: https://api.v2.sondehub.org/predictions?vehicles=${sonde.serial}`);
+            console.error(sondePredRaw);
+        }
         // Get location for current position
         decodeCityState(sondeData.latitude, sondeData.longitude).then(currentLocation => {
             // Next, predicted
@@ -52,13 +58,26 @@ const constUpdate = (sonde, message, original) => {
                  * message - d.js message object
                  */
                 const time = moment(sondeData.predictionTime*1000).tz(TIMEZONE).format('hh:mm A');
-                const embeds = [
+                // Handle templating for unusual/usual(shows picture)
+                let newEmbed;
+                if(unusual) {
+                    newEmbed = sondeTemplates.embeds.unusualLaunch(sonde);
+                    newEmbed.title = `Unusual Sonde ${sonde.subtype} ${sonde.serial} detected!`
+                } else {
+                    newEmbed = sondeTemplates.embeds.normalLaunch(sonde);
+                }
+
+                newEmbed.fields = [
                     {
                         "name": `Frequency: ${sonde.frequency} MHz`,
                         "value": `\u200B`
                     },
                     {
-                        "name": `Position: Over ${currentLocation}`,
+                        "name": `Altitude: ${utils.mToft(sonde.alt).toLocaleString("en-US")} ft`,
+                        "value": "\u200B"
+                    },
+                    {
+                        "name": `Over ${currentLocation}`,
                         "value": `\u200B`
                     },
                     {
@@ -66,8 +85,13 @@ const constUpdate = (sonde, message, original) => {
                         "value": `\u200B`
                     },
                 ];
+                // If RS41
+                if(sonde.type === 'RS41'){
+                    newEmbed = sondeTemplates.appendRS41Datecode(sonde, embed);
+                }
+                // Update msg
                 message.edit({
-                    fields: embeds
+                    embeds:[newEmbed]
                 }).then(nmsg=>{
                     // Check if sonde is supposed to be landed.
                     const utime = Math.floor(+new Date() / 1000);

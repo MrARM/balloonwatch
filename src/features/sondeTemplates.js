@@ -1,5 +1,6 @@
 // Contains all templates used on discord to send or update messages
 const rs41Datecode = require('./rs41_datecode');
+const utils = require('../utils');
 
 const discordEmbedWrapper = (content, message) => {
     return {
@@ -30,6 +31,10 @@ const normalLaunch = sonde => {
                     {
                         "name": `Frequency: ${sonde.frequency} MHz`,
                         "value": `\u200B`
+                    },
+                    {
+                        "name": `Altitude: ${utils.mToft(sonde.alt).toLocaleString("en-US")} ft`,
+                        "value": "\u200B"
                     }
                 ]
             };
@@ -38,7 +43,7 @@ const normalLaunch = sonde => {
 const unusualLaunch = sonde => {
     return {
         "type": "rich",
-        "title": `Unusual Sonde launch detected!`,
+        "title": 'Unusual Sonde launch detected!',
         "description": "",
         "color": 0x00FFFF,
         "fields": [
@@ -55,7 +60,7 @@ const unusualLaunch = sonde => {
                 "value": "\u200B"
             },
             {
-                "name": `Altitude: ${sonde.alt} m`,
+                "name": `Altitude: ${utils.mToft(sonde.alt).toLocaleString("en-US")} ft`,
                 "value": "\u200B"
             }
         ],
@@ -83,6 +88,11 @@ module.exports = {
         }
         return discordEmbedWrapper("<@&980937123463069716>", embed);
     },
+    embeds: {
+        unusualLaunch,
+        normalLaunch
+    },
+    appendRS41Datecode,
     discordEmbedWrapper
 }
 

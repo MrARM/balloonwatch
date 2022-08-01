@@ -59,11 +59,13 @@ const discordSend = sonde => {
     if (utils.checkUsualTime()) {
         const generatedMessage = sondeTemplate.normal(sonde);
         discord.channels.cache.get(process.env.DISCORD_CHANNEL).send(generatedMessage).then(nmsg=>{
-            setTimeout(()=>sondeUpdates.constUpdate(sonde, nmsg, generatedMessage), 60 * 1000);
+            setTimeout(()=>sondeUpdates.constUpdate(sonde, nmsg, generatedMessage, false), 60 * 1000);
         });
     } else {
         const generatedUnusualMessage = sondeTemplate.unusual(sonde);
-        discord.channels.cache.get(process.env.DISCORD_CHANNEL).send(generatedUnusualMessage);
+        discord.channels.cache.get(process.env.DISCORD_CHANNEL).send(generatedUnusualMessage).then(nmsg=>{
+            setTimeout(()=>sondeUpdates.constUpdate(sonde, nmsg, generatedUnusualMessage, true), 60 * 1000);
+        });
     }
 };
 
