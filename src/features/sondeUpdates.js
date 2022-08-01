@@ -48,9 +48,7 @@ const constUpdate = (sonde, message, original, unusual) => {
         // Get location for current position
         decodeCityState(sondeData.latitude, sondeData.longitude).then(currentLocation => {
             // Next, predicted
-            console.debug(`[SondeUpdates:D] Currloc: ${currentLocation}`);
             decodeCityState(sondeData.predictedLatitude, sondeData.predictedLongitude).then(predictedLocation => {
-                console.debug(`[SondeUpdates:D] Predloc: ${currentLocation}`);
                 /* We have everything we want for a message.
                  * sondeData - Location of the radiosonde + prediction
                  * currentLocation
@@ -62,7 +60,7 @@ const constUpdate = (sonde, message, original, unusual) => {
                 let newEmbed;
                 if(unusual) {
                     newEmbed = sondeTemplates.embeds.unusualLaunch(sonde);
-                    newEmbed.title = `Unusual Sonde ${sonde.subtype} ${sonde.serial} detected!`
+                    newEmbed.title = `Unusual Sonde ${sonde.type} ${sonde.serial} detected!`
                 } else {
                     newEmbed = sondeTemplates.embeds.normalLaunch(sonde);
                 }
@@ -81,7 +79,7 @@ const constUpdate = (sonde, message, original, unusual) => {
                         "value": `\u200B`
                     },
                     {
-                        "name": `Predicted to land at ${predictedLocation} around ${time}`,
+                        "name": `Predicted to land in ${predictedLocation} around ${time}`,
                         "value": `\u200B`
                     },
                 ];
