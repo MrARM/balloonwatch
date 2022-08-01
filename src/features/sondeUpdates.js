@@ -71,7 +71,7 @@ const constUpdate = (sonde, message, original, unusual) => {
                         "value": `\u200B`
                     },
                     {
-                        "name": `Altitude: ${utils.mToft(sonde.alt).toLocaleString("en-US")} ft`,
+                        "name": `Altitude: ${utils.mToft(sondeData.altitude).toLocaleString("en-US")} ft`,
                         "value": "\u200B"
                     },
                     {
