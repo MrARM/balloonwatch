@@ -1,8 +1,8 @@
 // This file will handle testing whether discord messages send correctly.
 const {Client, Intents} = require('discord.js');
 const discord = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
-const DISCORD_CHANNEL = '524013907942178828';
-const DISCORD_TOKEN = 'ODMzNzcyMTcyMjU4MzEyMjAy.G0qmfy.GTUpMkObWb8Qbk51ubBj65YOif5lguPmFpE9VY';
+const DISCORD_CHANNEL = '<ADD CHANNEL HERE>';
+const DISCORD_TOKEN = '<ADD TOKEN HERE>';
 
 discord.login(DISCORD_TOKEN);
 
