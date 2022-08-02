@@ -126,7 +126,8 @@ const decodeSHPrediction = (predictionResponse) => {
         error: false, // If no sondes are present. This is also the call to shut off the interval.
         serial: 'N0CALL', // radiosonde serial, used for reference and debugging.
         latitude: 0.0, // Current latitude of time of prediction, this will not necessarily line up with the current location.
-        longitude: 0.0, // Current longitude of time of prediction, same as above
+        longitude: 0.0, // Current longitude of time of prediction, same as above,
+        altitude: 0.0,
         predictedLatitude: 0.0, // Predicted landing latitude
         predictedLongitude: 0.0, // Predicted landing longitude
         predictionTime: 0, // Epoch of predicted landing time
@@ -145,6 +146,7 @@ const decodeSHPrediction = (predictionResponse) => {
     output.serial = predictionResponse[0].vehicle;
     output.latitude = predictionResponse[0].latitude;
     output.longitude = predictionResponse[0].longitude;
+    output.altitude = predictionResponse[0].altitude;
     if (predictionResponse[0].descending) output.burst = true;
 
     // Process the prediction object(JSON-in-JSON)
