@@ -48,6 +48,7 @@ const constUpdate = (sonde, message, original, unusual, haderror = false) => {
             // Retry - 5 minutes if no prior error.
             if(!haderror){
                 setTimeout(()=>constUpdate(sonde, message, original, unusual, true),ERROR_REFRESH_TIME);
+                return;
             }
         }
         // Get location for current position
