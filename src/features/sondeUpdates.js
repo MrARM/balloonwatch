@@ -44,6 +44,8 @@ const constUpdate = (sonde, message, original, unusual) => {
         if(sondeData.error){
             console.error(`ERR! URL: https://api.v2.sondehub.org/predictions?vehicles=${sonde.serial}`);
             console.error(sondePredRaw);
+            // Retry - 5 minutes
+            setTimeout(()=>constUpdate(sonde, message, original, unusual),5*60000);
         }
         // Get location for current position
         decodeCityState(sondeData.latitude, sondeData.longitude).then(currentLocation => {
@@ -94,7 +96,7 @@ const constUpdate = (sonde, message, original, unusual) => {
                     // Check if sonde is supposed to be landed.
                     const utime = Math.floor(+new Date() / 1000);
                     if(utime < (sondeData.predictionTime + RESET_TIME)){
-                        setTimeout(()=>constUpdate(sonde, nmsg, original),REFRESH_TIME);
+                        setTimeout(()=>constUpdate(sonde, nmsg, original, unusual),REFRESH_TIME);
                     }
                 });
             }).catch(err=>console.error(`[SondeUpdates:E] ${err}`));
