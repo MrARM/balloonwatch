@@ -6,6 +6,7 @@ test('Decode a SondeHub prediction (ascending)', () => {
     expect(decoded).toEqual({
         error: false,
         serial: 'U0370390',
+        altitude: 19498.2,
         latitude: 44.82490996364504,
         longitude: 26.95381997153163,
         predictedLatitude: 44.89407661394611,
