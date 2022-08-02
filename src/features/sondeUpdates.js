@@ -34,9 +34,10 @@ const utils = require("../utils");
 
 const TIMEZONE = 'America/Chicago';
 const REFRESH_TIME = 2 * 60000; // Refresh every X minutes
+const ERROR_REFRESH_TIME = 5 * 60000; // Refresh every X minutes after an error
 const RESET_TIME = 10 * 60; // Stop tracking if predictions says it landed after X minutes.
 
-const constUpdate = (sonde, message, original, unusual) => {
+const constUpdate = (sonde, message, original, unusual, haderror = false) => {
     console.log(`[SondeUpdates] Starting update for sonde ${sonde.serial}`);
     // Grab sonde info
     fetch(`https://api.v2.sondehub.org/predictions?vehicles=${sonde.serial}`).then(response => response.json().then(sondePredRaw => {
@@ -44,8 +45,10 @@ const constUpdate = (sonde, message, original, unusual) => {
         if(sondeData.error){
             console.error(`ERR! URL: https://api.v2.sondehub.org/predictions?vehicles=${sonde.serial}`);
             console.error(sondePredRaw);
-            // Retry - 5 minutes
-            setTimeout(()=>constUpdate(sonde, message, original, unusual),5*60000);
+            // Retry - 5 minutes if no prior error.
+            if(!haderror){
+                setTimeout(()=>constUpdate(sonde, message, original, unusual, true),ERROR_REFRESH_TIME);
+            }
         }
         // Get location for current position
         decodeCityState(sondeData.latitude, sondeData.longitude).then(currentLocation => {
