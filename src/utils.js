@@ -32,7 +32,12 @@ const checkUsualTime = () => {
     return usualTime;
 }
 
+const mToft = meters => {
+    return Math.trunc(meters * 3.2808);
+}
+
 module.exports = {
     inside_poly,
-    checkUsualTime
+    checkUsualTime,
+    mToft
 };

@@ -28,6 +28,10 @@ test('Create a usual sonde launch message with a DFM-17', () => {
                 {
                     "name": "Frequency: 405.11 MHz",
                     "value": `\u200B`
+                },
+                {
+                    "name": "Altitude: 40,503 ft",
+                    "value": '\u200B'
                 }
             ],
             "color": 65535,
@@ -60,7 +64,7 @@ test('Create an unusual sonde launch message with a DFM-17', () => {
                     "value": '\u200B'
                 },
                 {
-                    "name": "Altitude: 12345.6 m",
+                    "name": "Altitude: 40,503 ft",
                     "value": '\u200B'
                 }
             ],
@@ -87,6 +91,10 @@ test('Create a usual sonde launch message with a RS-41', () => {
                 {
                     "name": "Frequency: 405.11 MHz",
                     "value": `\u200B`
+                },
+                {
+                    "name": "Altitude: 40,503 ft",
+                    "value": '\u200B'
                 },
                 {
                     "name": "Sonde manufactured: 6/10/2020",
@@ -123,7 +131,7 @@ test('Create an unusual sonde launch message with a RS41', () => {
                     "value": '\u200B'
                 },
                 {
-                    "name": "Altitude: 12345.6 m",
+                    "name": "Altitude: 40,503 ft",
                     "value": '\u200B'
                 },
                 {
