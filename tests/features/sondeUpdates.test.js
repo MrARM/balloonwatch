@@ -37,7 +37,7 @@ test('Decode coordinates to a county', () => {
 test('Decode coordinates to a city', () => {
     expect.assertions(1);
     return sondeUpdates.decodeCityState(39.142243993, -94.577683759).then(data => {
-        expect(data).toEqual('North Kansas City, MO');
+        expect(data).toEqual('Kansas City, MO');
     });
 });
 
