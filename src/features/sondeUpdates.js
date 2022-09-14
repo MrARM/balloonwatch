@@ -43,13 +43,18 @@ const constUpdate = (sonde, message, original, unusual, haderror = false) => {
     fetch(`https://api.v2.sondehub.org/predictions?vehicles=${sonde.serial}`).then(response => response.json().then(sondePredRaw => {
         const sondeData = decodeSHPrediction(sondePredRaw);
         if(sondeData.error){
-            console.error(`ERR! URL: https://api.v2.sondehub.org/predictions?vehicles=${sonde.serial}`);
+            console.error(`[sondeUpdates] ERR! URL: https://api.v2.sondehub.org/predictions?vehicles=${sonde.serial}`);
             console.error(sondePredRaw);
             // Retry - 5 minutes if no prior error.
             if(!haderror){
                 setTimeout(()=>constUpdate(sonde, message, original, unusual, true),ERROR_REFRESH_TIME);
                 return;
+            } else {
+                console.log('[sondeUpdates] Sequential errors in predictions. Cancelling this one.');
+                return;
             }
+        } else {
+            haderror = false;
         }
         // Get location for current position
         decodeCityState(sondeData.latitude, sondeData.longitude).then(currentLocation => {
