@@ -42,6 +42,7 @@ const constUpdate = (sonde, message, original, unusual, haderror = false) => {
     // Grab sonde info
     fetch(`https://api.v2.sondehub.org/predictions?vehicles=${sonde.serial}`).then(response => response.json().then(sondePredRaw => {
         const sondeData = decodeSHPrediction(sondePredRaw);
+        const altitudeIndicator = sondeData.burst ? '↓':'↑';
         if(sondeData.error){
             console.error(`[sondeUpdates] ERR! URL: https://api.v2.sondehub.org/predictions?vehicles=${sonde.serial}`);
             console.error(sondePredRaw);
@@ -66,7 +67,7 @@ const constUpdate = (sonde, message, original, unusual, haderror = false) => {
                  * predictedLocation
                  * message - d.js message object
                  */
-                const time = moment(sondeData.predictionTime*1000).tz(TIMEZONE).format('hh:mm A');
+                const time = moment(sondeData.predictionTime5*1000).tz(TIMEZONE).format('hh:mm A');
                 // Handle templating for unusual/usual(shows picture)
                 let newEmbed;
                 if(unusual) {
@@ -82,7 +83,7 @@ const constUpdate = (sonde, message, original, unusual, haderror = false) => {
                         "value": `\u200B`
                     },
                     {
-                        "name": `Altitude: ${utils.mToft(sondeData.altitude).toLocaleString("en-US")} ft`,
+                        "name": `Altitude: ${utils.mToft(sondeData.altitude).toLocaleString("en-US")} ft ${altitudeIndicator}`,
                         "value": "\u200B"
                     },
                     {
