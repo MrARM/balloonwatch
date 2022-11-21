@@ -10,7 +10,7 @@
     "moment-timezone": "^0.5.39",
     "mongodb": "^4.9.1",
     "mqtt": "^4.3.7",
-    "node-fetch": "2.6.7"
+    "node-fetch": "3.3.0"
   },
   "scripts": {
     "start": "node src/core.js",
