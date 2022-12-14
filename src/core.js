@@ -1,5 +1,5 @@
 // Reqs
-const {Client, Intents} = require('discord.js');
+const {Client, GatewayIntentBits} = require('discord.js');
 const moment = require('moment');
 const {MongoClient} = require('mongodb');
 const mqtt = require('mqtt');
@@ -10,7 +10,7 @@ const sondeTemplate = require('./features/sondeTemplates');
 const utils = require('./utils');
 
 // Instances
-const discord = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
+const discord = new Client({intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]});
 const client = mqtt.connect('wss://ws-reader.v2.sondehub.org');
 const mongo = new MongoClient(process.env.MONGO_URI || 'mongodb://localhost:27017/');
 
