@@ -67,7 +67,7 @@ const constUpdate = (sonde, message, original, unusual, haderror = false) => {
                  * predictedLocation
                  * message - d.js message object
                  */
-                const time = moment(sondeData.predictionTime5*1000).tz(TIMEZONE).format('hh:mm A');
+                const time = moment(sondeData.predictionTime*1000).tz(TIMEZONE).format('hh:mm A');
                 // Handle templating for unusual/usual(shows picture)
                 let newEmbed;
                 if(unusual) {
