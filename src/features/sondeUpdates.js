@@ -22,7 +22,7 @@
  *  - Unusual sonde launches will need to have elements changed.
  *
  *  POSITION: Over Manhattan, KS
- *  ~~~~ALTITUDE: 71,076 ft~~~~ - Scrapped because we will not be updating live.
+ *  ALTITUDE: 71,076 ft (Arrow indicator)
  *  PREDICTED TO LAND AT: Olathe, KS
  *  PREDICTED LANDING TIME: 9:21 PM
  */
@@ -67,7 +67,7 @@ const constUpdate = (sonde, message, original, unusual, haderror = false) => {
                  * predictedLocation
                  * message - d.js message object
                  */
-                const time = moment(sondeData.predictionTime5*1000).tz(TIMEZONE).format('hh:mm A');
+                const time = moment(sondeData.predictionTime*1000).tz(TIMEZONE).format('hh:mm A');
                 // Handle templating for unusual/usual(shows picture)
                 let newEmbed;
                 if(unusual) {
