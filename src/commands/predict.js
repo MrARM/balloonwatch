@@ -135,12 +135,16 @@ module.exports = {
             const date = dates.shift();
             const predictionCoordsTop = await pullPrediction(config.stations.topeka, date);
             const predictionCoordsOax = await pullPrediction(config.stations.omaha, date);
+            const predictionCoordsDodge = await pullPrediction(config.stations.dodge, date);
 
             if(utils.inside_poly([predictionCoordsTop.longitude, predictionCoordsTop.latitude], config.watch_polygon)){
                 await addPrediction(embed, 'TOP', date, predictionCoordsTop);
             }
             if(utils.inside_poly([predictionCoordsOax.longitude, predictionCoordsOax.latitude], config.watch_polygon)){
                 await addPrediction(embed, 'OAX', date, predictionCoordsOax);
+            }
+            if(utils.inside_poly([predictionCoordsDodge.longitude, predictionCoordsDodge.latitude], config.watch_polygon)){
+                await addPrediction(embed, 'DDC', date, predictionCoordsDodge);
             }
         }
 
