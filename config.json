@@ -112,5 +112,25 @@
         ]
       ]
     }
-  ]
+  ],
+  "predictions": {
+    "daysForward": 3,
+    "time_offset": {
+      "am": "11:15:00",
+      "pm": "23:15:00"
+    },
+    "ascent_rate": 5.3,
+    "burst_alt": 33200,
+    "descent_rate": 3.2
+  },
+  "stations": {
+    "topeka": {
+      "lat": 39.0722,
+      "lon": 264.3694
+    },
+    "omaha": {
+      "lat": 41.3202,
+      "lon": 263.6331
+    }
+  }
 }

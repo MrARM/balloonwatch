@@ -22,7 +22,7 @@
  *  - Unusual sonde launches will need to have elements changed.
  *
  *  POSITION: Over Manhattan, KS
- *  ~~~~ALTITUDE: 71,076 ft~~~~ - Scrapped because we will not be updating live.
+ *  ALTITUDE: 71,076 ft (Arrow indicator)
  *  PREDICTED TO LAND AT: Olathe, KS
  *  PREDICTED LANDING TIME: 9:21 PM
  */
