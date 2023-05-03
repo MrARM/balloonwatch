@@ -31,11 +31,50 @@ const fetch = require('node-fetch');
 const moment = require('moment-timezone');
 const sondeTemplates = require('./sondeTemplates');
 const utils = require("../utils");
+const sites = require('../../sites.json');
 
 const TIMEZONE = 'America/Chicago';
 const REFRESH_TIME = 2 * 60000; // Refresh every X minutes
 const ERROR_REFRESH_TIME = 5 * 60000; // Refresh every X minutes after an error
 const RESET_TIME = 10 * 60; // Stop tracking if predictions says it landed after X minutes.
+
+// Pull the initial sonde position from the API
+const pullReversePrediction = (sonde) => {
+    return new Promise(async (resolve, reject) => {
+        // Grab reverse prediction data
+        const response = await fetch(`https://api.v2.sondehub.org/predictions/reverse?vehicles=${sonde.serial}`);
+        // Check for errors
+        if(!response.ok){
+            reject('No location found');
+            return;
+        }
+        // Decode the data
+        const sondeRevPredRaw = await response.json();
+
+        // Check if there is a location property first
+        if(Object.keys(sondeRevPredRaw).length === 0){
+            reject('No sonde found');
+            return;
+        }
+
+        else if(!sondeRevPredRaw[sonde.serial].hasOwnProperty('launch_site')){
+            reject('No location found');
+            return;
+        }
+
+        const launchSite = sondeRevPredRaw[sonde.serial].launch_site;
+
+        // Look up the launch site ID
+        if(sites.hasOwnProperty(launchSite)){
+            const siteData = sites[launchSite];
+            resolve(siteData.station_name);
+        } else {
+            reject('Site exists for ${launchSite} but no data found locally.');
+            return;
+        }
+
+    });
+}
 
 const constUpdate = (sonde, message, original, unusual, haderror = false) => {
     console.log(`[SondeUpdates] Starting update for sonde ${sonde.serial}`);
@@ -72,7 +111,7 @@ const constUpdate = (sonde, message, original, unusual, haderror = false) => {
                 let newEmbed;
                 if(unusual) {
                     newEmbed = sondeTemplates.embeds.unusualLaunch(sonde);
-                    newEmbed.title = `Unusual Sonde ${sonde.type} ${sonde.serial} detected!`
+                    newEmbed.title = `Unusual Sonde ${sonde.type} ${sonde.serial} detected!`;
                 } else {
                     newEmbed = sondeTemplates.embeds.normalLaunch(sonde);
                 }
@@ -99,15 +138,36 @@ const constUpdate = (sonde, message, original, unusual, haderror = false) => {
                 if(sonde.type === 'RS41'){
                     newEmbed = sondeTemplates.appendRS41Datecode(sonde, newEmbed);
                 }
-                // Update msg
-                message.edit({
-                    embeds:[newEmbed]
-                }).then(nmsg=>{
-                    // Check if sonde is supposed to be landed.
-                    const utime = Math.floor(+new Date() / 1000);
-                    if(utime < (sondeData.predictionTime + RESET_TIME)){
-                        setTimeout(()=>constUpdate(sonde, nmsg, original, unusual),REFRESH_TIME);
+                // Attempt to decode the launch site
+                pullReversePrediction(sonde).then(launchSite => {
+                    // Update the title
+                    if(unusual){
+                        newEmbed.title = `Unusual ${sonde.type} ${sonde.serial} from ${launchSite}`;
+                    } else {
+                        newEmbed.title = `${sonde.type} ${sonde.serial} from ${launchSite} launched`;
                     }
+                    // Update msg
+                    message.edit({
+                        embeds:[newEmbed]
+                    }).then(nmsg=>{
+                        // Check if sonde is supposed to be landed.
+                        const utime = Math.floor(+new Date() / 1000);
+                        if(utime < (sondeData.predictionTime + RESET_TIME)){
+                            setTimeout(()=>constUpdate(sonde, nmsg, original, unusual),REFRESH_TIME);
+                        }
+                    });
+                }).catch(err => {
+                    console.log(`[SondeUpdates] Failed to pull launch site for ${sonde.serial}, ${err}`);
+                    // Update msg
+                    message.edit({
+                        embeds:[newEmbed]
+                    }).then(nmsg=>{
+                        // Check if sonde is supposed to be landed.
+                        const utime = Math.floor(+new Date() / 1000);
+                        if(utime < (sondeData.predictionTime + RESET_TIME)){
+                            setTimeout(()=>constUpdate(sonde, nmsg, original, unusual),REFRESH_TIME);
+                        }
+                    });
                 });
             }).catch(err=>console.error(`[SondeUpdates:E] ${err}`));
         }).catch(err=>console.error(`[SondeUpdates:E] ${err}`));
@@ -183,5 +243,6 @@ const decodeSHPrediction = (predictionResponse) => {
 module.exports = {
     decodePrediction: decodeSHPrediction,
     decodeCityState,
-    constUpdate
+    constUpdate,
+    pullReversePrediction
 };
