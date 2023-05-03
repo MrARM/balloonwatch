@@ -297,10 +297,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@bigdatacloudapi/client@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@bigdatacloudapi/client/-/client-1.1.1.tgz#de3301f255f3c9ca6b387627bdb00754fca6980d"
-  integrity sha512-WHYCu0vG+V7+YnCE8fmUJdwtabUIe5GWr9qSo4wmMcIROLjY78Cfy0bciPhjRXiz8maTcl//hxuHL7Mu8D7qDQ==
+"@bigdatacloudapi/client@^1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@bigdatacloudapi/client/-/client-1.1.3.tgz#788845fefa027dad500ec46a3aa679015681fd56"
+  integrity sha512-5Dz+kx/Bvjt4JiwvVcDB/sgTWx6nfqMfUxE9BzS4lwX0IBE2O5wOBxmGCumnX8Li3D/0W9XzzkB7TF0oeL5nEw==
   dependencies:
     node-fetch "^2.6.1"
 
