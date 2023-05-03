@@ -42,6 +42,10 @@ const createTimestamp = (year, month, day, time) => {
         month++;
     }
 
+    // FIX: Pad month and day with 0s
+    month = String(month).padStart(2, '0');
+    day = String(day).padStart(2, '0');
+
     // After overflows have been addressed, format the timestamp to pass off.
     return `${year}-${month}-${day}T${time}Z`;
 };
@@ -76,13 +80,20 @@ const getDateSeries = day_count => {
 
 // Get an url to grab a prediction
 const generateUrl = (station, time) => {
-    return `https://api.v2.sondehub.org/tawhiri?launch_latitude=${station.lat}&launch_longitude=${station.lon}&launch_datetime=${time}&ascent_rate=${conf.ascent_rate}&burst_altitude=${conf.burst_alt}&descent_rate=${conf.descent_rate}`;
+    const url = `https://api.v2.sondehub.org/tawhiri?launch_latitude=${station.lat}&launch_longitude=${station.lon}&launch_datetime=${time}&ascent_rate=${conf.ascent_rate}&burst_altitude=${conf.burst_alt}&descent_rate=${conf.descent_rate}`;
+    //console.log(`[PREDICTIONS] Generating URL for ${station.name} at ${time}. URL: ${url}`);
+    return url;
 };
 
 const pullPrediction = async (station, time) => {
     // Grab SH data
     const response = await fetch(generateUrl(station, time));
     const data = await response.json();
+    // If the error attribute exists, then the prediction failed.
+    if (data.error) {
+        console.log(`[PREDICTIONS] Failed to pull prediction for ${station.name} at ${time}.`);
+        return null;
+    }
     const last_prediction = data.prediction[1].trajectory[data.prediction[1].trajectory.length-1];
     last_prediction.longitude -= 360; // Convert a positive longitude from tawhiri to a proper negative. (This may cause side effects for regions with a positive longitude)
     return last_prediction;
@@ -136,16 +147,33 @@ module.exports = {
             const predictionCoordsTop = await pullPrediction(config.stations.topeka, date);
             const predictionCoordsOax = await pullPrediction(config.stations.omaha, date);
             const predictionCoordsDodge = await pullPrediction(config.stations.dodge, date);
+            try{
+                if(utils.inside_poly([predictionCoordsTop.longitude, predictionCoordsTop.latitude], config.watch_polygon)){
+                    await addPrediction(embed, 'TOP', date, predictionCoordsTop);
+                }
+                if(utils.inside_poly([predictionCoordsOax.longitude, predictionCoordsOax.latitude], config.watch_polygon)){
+                    await addPrediction(embed, 'OAX', date, predictionCoordsOax);
+                }
+                if(utils.inside_poly([predictionCoordsDodge.longitude, predictionCoordsDodge.latitude], config.watch_polygon)){
+                    await addPrediction(embed, 'DDC', date, predictionCoordsDodge);
+                }
+            } catch (e){
+                console.log(`[PREDICTIONS] Failed.`);
+                console.error(e);
 
-            if(utils.inside_poly([predictionCoordsTop.longitude, predictionCoordsTop.latitude], config.watch_polygon)){
-                await addPrediction(embed, 'TOP', date, predictionCoordsTop);
+                // Start building error embed, better than using the old one in the case there is existing data.
+                const err_embed = new EmbedBuilder()
+                    .setColor(0xFF0000)
+                    .setTitle('Error')
+                    .setDescription('Prediction data failed to load.')
+                    .setTimestamp()
+                    .setFooter({text: 'Get updated predictions using /predictions'});
+
+                await interaction.editReply({embeds: [err_embed]});
+                return;
             }
-            if(utils.inside_poly([predictionCoordsOax.longitude, predictionCoordsOax.latitude], config.watch_polygon)){
-                await addPrediction(embed, 'OAX', date, predictionCoordsOax);
-            }
-            if(utils.inside_poly([predictionCoordsDodge.longitude, predictionCoordsDodge.latitude], config.watch_polygon)){
-                await addPrediction(embed, 'DDC', date, predictionCoordsDodge);
-            }
+
+
         }
 
         await interaction.editReply({embeds: [embed]});

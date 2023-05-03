@@ -9,7 +9,7 @@ const discordEmbedWrapper = (content, message) => {
             message
         ]
     };
-}
+};
 
 const appendRS41Datecode = (sonde, embed) => {
     const dateObj = rs41Datecode.resolveDate(sonde.serial);

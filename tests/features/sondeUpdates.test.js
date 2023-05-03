@@ -41,3 +41,24 @@ test('Decode coordinates to a city', () => {
     });
 });
 
+test('Decode a sonde back to it\'s launch site', () => {
+    expect.assertions(1);
+    return sondeUpdates.pullReversePrediction({serial: 'U0370390'}).then(data => {
+        expect(data).toEqual('Bucuresti / Imh (Romania)');
+    });
+});
+
+test('Test decoding an invalid sonde', () => {
+    expect.assertions(1);
+    return sondeUpdates.pullReversePrediction({serial: 'undefined'}).catch(err => {
+        expect(err).toEqual('No sonde found');
+    });
+});
+
+test('Test decoding a sonde launched outside of a launch site', () => {
+    expect.assertions(1);
+    return sondeUpdates.pullReversePrediction({serial: '170386C3'}).catch(err => {
+        expect(err).toEqual('No location found');
+    });
+});
+
