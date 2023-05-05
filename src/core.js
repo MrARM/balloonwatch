@@ -2,7 +2,7 @@
 const {Client, Collection, Events, GatewayIntentBits} = require('discord.js');
 const fs = require('node:fs');
 const moment = require('moment');
-const {MongoClient} = require('mongodb');
+const {MongoClient} = require('mongodb-legacy');
 const mqtt = require('mqtt');
 const path = require('node:path');
 
@@ -134,16 +134,15 @@ client.on('message', function (topic, message) {
     const batch_input = JSON.parse(message.toString());
     batch_input.forEach((sonde) => {
         if (utils.inside_poly([sonde.lon, sonde.lat], config.watch_polygon)) {
+
             if (mongodb !== false) {
 
                 // If a database connection was established continue
                 mongodb.findOne({serial: sonde.serial}).then((result) => {
                     if (result === null) {
                         // This is a new radiosonde
-                        mongodb.insertOne(sonde, function (err, res) {
-                            if (err) throw err;
+                        mongodb.insertOne(sonde).then(() => {
                             queueSend(sonde);
-
                         });
                     }
                 });
