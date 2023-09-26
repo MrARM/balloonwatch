@@ -1,26 +1,36 @@
 // Reqs
-const {Client, Collection, Events, GatewayIntentBits} = require('discord.js');
-const fs = require('node:fs');
-const moment = require('moment');
-const {MongoClient} = require('mongodb-legacy');
-const mqtt = require('mqtt');
-const path = require('node:path');
+import {Client, Collection, Events, GatewayIntentBits} from 'discord.js';
+import fs from 'node:fs';
+import moment from 'moment';
+import pkg from 'mongodb-legacy';
+const {MongoClient} = pkg;
+import mqtt from 'mqtt';
+import path from 'node:path';
+import { createClient } from 'redis';
 
-const config = require('../config.json');
-const sondeUpdates = require('./features/sondeUpdates');
-const sondeTemplate = require('./features/sondeTemplates');
-const utils = require('./utils');
+import config from '../config.json' assert { type: "json" };
+import sondeUpdates from './features/sondeUpdates.js';
+import sondeTemplate from './features/sondeTemplates.js';
+import utils from './utils.js';
+import pingCommand from './commands/ping.js';
+import predictCommand from './commands/predict.js';
 
 // Instances
 const discord = new Client({intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]});
 const client = mqtt.connect('wss://ws-reader.v2.sondehub.org');
 const mongo = new MongoClient(process.env.MONGO_URI || 'mongodb://localhost:27017/');
+const redis = createClient({
+    host: process.env.REDIS_HOST || 'localhost',
+    port: 6379,
+    password: process.env.REDIS_HOST_PASSWORD
+});
 
 // State
 let discord_active = false;
 let mongodb = false;
 // This stops rapid floods of messages by only queueing a message to be sent once
 let sondeQueue = [];
+redis.on('error', err => console.error('Redis Client Error', err));
 
 const queueSend = sonde => {
     let can_add = true;
@@ -85,20 +95,27 @@ discord.once('ready', () => {
     console.log('[Discord] Connected.');
     discord.commands = new Collection();
 
-    // https://discordjs.guide/creating-your-bot/command-handling.html#loading-command-files
-    const commandsPath = path.join(__dirname, 'commands');
-    const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+    // This code is out of date, and needs to be updated to be supported as a module.
+    // We will manually import commands for now...
 
-    for (const file of commandFiles) {
-        const filePath = path.join(commandsPath, file);
-        const command = require(filePath);
-        // Set a new item in the Collection with the key as the command name and the value as the exported module
-        if ('data' in command && 'execute' in command) {
-            discord.commands.set(command.data.name, command);
-        } else {
-            console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-        }
-    }
+
+    discord.commands.set(pingCommand.data.name, pingCommand);
+    discord.commands.set(predictCommand.data.name, predictCommand);
+
+    // // https://discordjs.guide/creating-your-bot/command-handling.html#loading-command-files
+    // const commandsPath = path.join(__dirname, 'commands');
+    // const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+    //
+    // for (const file of commandFiles) {
+    //     const filePath = path.join(commandsPath, file);
+    //     const command = require(filePath);
+    //     // Set a new item in the Collection with the key as the command name and the value as the exported module
+    //     if ('data' in command && 'execute' in command) {
+    //         discord.commands.set(command.data.name, command);
+    //     } else {
+    //         console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+    //     }
+    // }
 
     discord_active = true;
 });
@@ -121,8 +138,9 @@ discord.on(Events.InteractionCreate, async interaction => {
 });
 
 
-client.on('connect', function () {
-    client.subscribe('batch', function (err) {
+client.on('connect', async () => {
+    //await redis.connect();
+    client.subscribe('batch',  err => {
         if (!err) {
             console.log('[MQTT] Connected');
         }

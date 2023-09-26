@@ -1,5 +1,14 @@
 # BalloonWatch - A program to notify a group when a balloon launches nearby
 
+## Rework Notice
+
+There is a shift to Redis to handle runtime memory (sonde launches).
+
+Redis was a better fit to handle a high volume amount of data. Using mongodb in the way v1 did was not a good method to check whether a radiosonde had been launched recently, not to mention there was several times when I had a database crash over the few years that balloony used mongodb in that way. 
+
+Changing this should allow the use of mongodb without fear that the high traffic of radiosonde checking causing any issues to break the database.
+
+
 ## Setup
 **Set the following environment variables to configure the system**
 

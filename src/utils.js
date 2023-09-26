@@ -1,6 +1,6 @@
 // This file contains utilities that are independent of the core or features
-const moment = require("moment");
-const config = require("../config.json");
+import moment from "moment";
+import config from "../config.json" assert { type: "json" };
 
 const inside_poly = (point, vs) => {
     // ray-casting algorithm based on
@@ -36,7 +36,7 @@ const mToft = meters => {
     return Math.trunc(meters * 3.2808);
 }
 
-module.exports = {
+export default {
     inside_poly,
     checkUsualTime,
     mToft

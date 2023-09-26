@@ -1,6 +1,6 @@
 // Contains all templates used on discord to send or update messages
-const rs41Datecode = require('./rs41_datecode');
-const utils = require('../utils');
+import rs41Datecode from './rs41_datecode.js';
+import utils from '../utils.js';
 
 const discordEmbedWrapper = (content, message) => {
     return {
@@ -12,7 +12,7 @@ const discordEmbedWrapper = (content, message) => {
 };
 
 const appendRS41Datecode = (sonde, embed) => {
-    const dateObj = rs41Datecode.resolveDate(sonde.serial);
+    const dateObj = rs41Datecode(sonde.serial);
     embed.fields.push({
         "name": `Sonde manufactured: ${dateObj.toLocaleDateString('en-US')}`,
         "value": "\u200B"
@@ -73,7 +73,7 @@ const unusualLaunch = sonde => {
     };
 };
 
-module.exports = {
+export default {
     normal: sonde => {
         let embed = normalLaunch(sonde);
         if(sonde.type == 'RS41'){
@@ -94,5 +94,5 @@ module.exports = {
     },
     appendRS41Datecode,
     discordEmbedWrapper
-}
+};
 

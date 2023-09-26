@@ -65,7 +65,7 @@ const sonde_rs41 = {
     "uploader_alt": 148
 };
 
-module.exports = {
+export default {
     rs41: sonde_rs41,
     dfm17: sonde_dfm17
 };

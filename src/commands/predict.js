@@ -1,15 +1,16 @@
 // /predictions
 // Pulls prediction data for both TOP and OAX, and displays the next 7 days of launches given the following criteria
 // Sonde is in balloony range
-const bdcApi = require('@bigdatacloudapi/client')('bdc_3d481cc4c2634116a59c23f2d47383a6');
-const fetch = require('node-fetch');
-const config = require('../../config.json');
-const utils = require('../utils');
+import bdcApi from '@bigdatacloudapi/client';
+import fetch from 'node-fetch';
+import config from '../../config.json' assert { type: "json" };
+import utils from '../utils.js';
 
-const { EmbedBuilder } = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+import { EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 
 // Shorthand
+const bdc = bdcApi(process.env.BDC_API_KEY);
 const conf = config.predictions;
 
 const createTimestamp = (year, month, day, time) => {
@@ -101,7 +102,7 @@ const pullPrediction = async (station, time) => {
 
 const addPrediction = async (embed, station, time, prediction) => {
     // Get the location
-    const geocode = await bdcApi.getReverseGeocode({latitude: prediction.latitude, longitude: prediction.longitude});
+    const geocode = await bdc.getReverseGeocode({latitude: prediction.latitude, longitude: prediction.longitude});
     let location = '';
     if (geocode.city === '') {
         location += geocode.locality + ', ';
@@ -122,7 +123,7 @@ const addPrediction = async (embed, station, time, prediction) => {
     embed.addFields({name: headerStr, value: location, inline: false});
 };
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName('predictions')
         .setDescription('Pulls prediction data for both TOP and OAX - Only if they land in balloony territory'),

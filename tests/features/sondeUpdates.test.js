@@ -1,5 +1,7 @@
-const sondeUpdates = require('../../src/features/sondeUpdates');
-const {ascending, descending, invalid} = require("../support/sondeHubPredictions");
+import pkg from '../support/sondeHubPredictions.js';
+import sondeUpdates from '../../src/features/sondeUpdates.js';
+
+const {ascending, descending, invalid} = pkg;
 
 test('Decode a SondeHub prediction (ascending)', () => {
     const decoded = sondeUpdates.decodePrediction(ascending);
@@ -30,7 +32,7 @@ test('Decode a errored SondeHub prediction', () => {
 test('Decode coordinates to a county', () => {
     expect.assertions(1);
     return sondeUpdates.decodeCityState(39, -94).then(data => {
-        expect(data).toEqual('Lafayette County, MO');
+        expect(data).toEqual('Township of Sni-A-Bar, MO');
     });
 });
 

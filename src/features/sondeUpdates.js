@@ -26,13 +26,14 @@
  *  PREDICTED TO LAND AT: Olathe, KS
  *  PREDICTED LANDING TIME: 9:21 PM
  */
-const bdcApi = require('@bigdatacloudapi/client')('bdc_3d481cc4c2634116a59c23f2d47383a6');
-const fetch = require('node-fetch');
-const moment = require('moment-timezone');
-const sondeTemplates = require('./sondeTemplates');
-const utils = require("../utils");
-const sites = require('../../sites.json');
+import bdcApi from '@bigdatacloudapi/client';
+import fetch from 'node-fetch';
+import moment from 'moment-timezone';
+import sondeTemplates from './sondeTemplates.js';
+import utils from '../utils.js';
+import sites from '../../sites.json' assert { type: "json" };
 
+const bdc = bdcApi(process.env.BDC_API_KEY);
 const TIMEZONE = 'America/Chicago';
 const REFRESH_TIME = 2 * 60000; // Refresh every X minutes
 const ERROR_REFRESH_TIME = 5 * 60000; // Refresh every X minutes after an error
@@ -176,7 +177,7 @@ const constUpdate = (sonde, message, original, unusual, haderror = false) => {
 
 const decodeCityState = (latitude, longitude) => {
     return new Promise((resolve, reject) => {
-        bdcApi.getReverseGeocode({
+        bdc.getReverseGeocode({
             latitude,
             longitude
         }).then(data => {
@@ -240,7 +241,7 @@ const decodeSHPrediction = (predictionResponse) => {
 
 //}
 
-module.exports = {
+export default {
     decodePrediction: decodeSHPrediction,
     decodeCityState,
     constUpdate,

@@ -1,5 +1,5 @@
-const utils = require('../src/utils');
-const polygon = require('./support/testPoly');
+import utils from '../src/utils.js';
+import polygon from './support/testPoly.js';
 
 // Test if poly system is working
 test('Test if inside a polygon fence', ()=>{

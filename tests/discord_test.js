@@ -1,5 +1,5 @@
 // This file will handle testing whether discord messages send correctly.
-const {Client, Intents} = require('discord.js');
+import {Client, Intents} from 'discord.js';
 const discord = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
 const DISCORD_CHANNEL = '<ADD CHANNEL HERE>';
 const DISCORD_TOKEN = '<ADD TOKEN HERE>';

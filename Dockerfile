@@ -1,6 +1,6 @@
 FROM node:18
 WORKDIR /app
 COPY . .
-RUN yarn install
+RUN npm install
 
-ENTRYPOINT ["yarn", "start"]
+ENTRYPOINT ["npm", "start"]

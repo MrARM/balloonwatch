@@ -46,6 +46,4 @@ const resolveDate = serial => {
     return dateObj;
 };
 
-module.exports = {
-    resolveDate
-};
+export default resolveDate;

@@ -1,5 +1,5 @@
-const sondeTemplates = require('../../src/features/sondeTemplates');
-const sonde = require('../support/sonde');
+import sondeTemplates from '../../src/features/sondeTemplates';
+import sonde from '../support/sonde.js';
 
 
 // Test a simple discord message with a blank embed

@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     [
         31.4318848,
         0.5712796
