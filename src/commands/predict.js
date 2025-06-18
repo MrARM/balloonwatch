@@ -1,7 +1,6 @@
 // /predictions
 // Pulls prediction data for both TOP and OAX, and displays the next 7 days of launches given the following criteria
 // Sonde is in balloony range
-const bdcApi = require('@bigdatacloudapi/client')('bdc_3d481cc4c2634116a59c23f2d47383a6');
 const fetch = require('node-fetch');
 const config = require('../../config.json');
 const utils = require('../utils');
@@ -101,14 +100,14 @@ const pullPrediction = async (station, time) => {
 
 const addPrediction = async (embed, station, time, prediction) => {
     // Get the location
-    const geocode = await bdcApi.getReverseGeocode({latitude: prediction.latitude, longitude: prediction.longitude});
+    const geocode = await utils.reqGeocode(`${prediction.latitude},${prediction.longitude}`);
     let location = '';
     if (geocode.city === '') {
-        location += geocode.locality + ', ';
+        location += geocode.county + ' County, ';
     } else {
         location += geocode.city + ', ';
     }
-    location += geocode.principalSubdivisionCode.split('-')[1]; // US-KS --> KS.
+    location += geocode.stateCode;
 
     // Generate the String
     // Ex: TOP, 07/07/22 AM - Johnson County, KS

@@ -30,7 +30,7 @@ test('Decode a errored SondeHub prediction', () => {
 test('Decode coordinates to a county', () => {
     expect.assertions(1);
     return sondeUpdates.decodeCityState(39, -94).then(data => {
-        expect(data).toEqual('Lafayette County, MO');
+        expect(data).toEqual('Odessa, MO');
     });
 });
 

@@ -26,7 +26,6 @@
  *  PREDICTED TO LAND AT: Olathe, KS
  *  PREDICTED LANDING TIME: 9:21 PM
  */
-const bdcApi = require('@bigdatacloudapi/client')('bdc_3d481cc4c2634116a59c23f2d47383a6');
 const fetch = require('node-fetch');
 const moment = require('moment-timezone');
 const sondeTemplates = require('./sondeTemplates');
@@ -176,17 +175,14 @@ const constUpdate = (sonde, message, original, unusual, haderror = false) => {
 
 const decodeCityState = (latitude, longitude) => {
     return new Promise((resolve, reject) => {
-        bdcApi.getReverseGeocode({
-            latitude,
-            longitude
-        }).then(data => {
+        utils.reqGeocode(`${latitude},${longitude}`).then(data => {
             let outStr = '';
             if (data.city === '') {
-                outStr += data.locality + ', ';
+                outStr += data.county + ' County, ';
             } else {
                 outStr += data.city + ', ';
             }
-            outStr += data.principalSubdivisionCode.split('-')[1]; // US-KS --> KS.
+            outStr += data.stateCode;
             resolve(outStr);
         }).catch(reason => reject(reason));
     });
