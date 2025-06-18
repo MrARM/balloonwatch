@@ -86,6 +86,7 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         env:
           COSIGN_EXPERIMENTAL: "false"
+          COSIGN_YES: "true"
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
-        run: cosign sign ${{ steps.meta.outputs.tags }}@${{ steps.build-and-push.outputs.digest }}
+        run: cosign sign --yes ${{ steps.meta.outputs.tags }}@${{ steps.build-and-push.outputs.digest }}
