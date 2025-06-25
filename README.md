@@ -1,3 +1,5 @@
+# ARCHIVED: Codebase has been changed significantly and a new version has been moved to https://github.com/MrARM/balloony
+
 # BalloonWatch - A program to notify a group when a balloon launches nearby
 
 ## Setup
